@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stopwatch</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="stopwatch-container">
+        <h1>Stopwatch</h1>
+        <div id="time-display">00:00:00</div>
+        <div class="controls">
+            <button id="start-stop" onclick="startStop()">Start</button>
+            <button id="reset" onclick="resetStopwatch()">Reset</button>
+            <button id="lap" onclick="recordLap()">Lap</button>
+        </div>
+        <ul id="lap-list"></ul>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f4f4f4;
+}
+
+.stopwatch-container {
+    text-align: center;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 300px;
+}
+
+h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+#time-display {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+.controls button {
+    padding: 10px 20px;
+    font-size: 16px;
+    margin: 5px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+}
+
+.controls button:hover {
+    background-color: #0056b3;
+}
+
+ul {
+    list-style-type: none;
+    margin-top: 20px;
+}
+
+li {
+    font-size: 16px;
+    margin: 5px 0;
+}
+</style>
+<script>
+let isRunning = false;
+let startTime;
+let updatedTime;
+let difference;
+let tInterval;
+let runningTime = 0;
+let lapCounter = 1; // Start lap count at 1
+const timeDisplay = document.getElementById("time-display");
+const startStopButton = document.getElementById("start-stop");
+const lapList = document.getElementById("lap-list");
+
+function startStop() {
+    if (!isRunning) {
+        startTime = new Date().getTime() - runningTime;
+        tInterval = setInterval(updateTime, 1);
+        startStopButton.innerHTML = "Pause";
+        isRunning = true;
+    } else {
+        clearInterval(tInterval);
+        startStopButton.innerHTML = "Resume";
+        isRunning = false;
+    }
+}
+
+function updateTime() {
+    updatedTime = new Date().getTime();
+    difference = updatedTime - startTime;
+    runningTime = difference;
+
+    let hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    let minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+    let seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+    hours = (hours < 10) ? "0" + hours : hours;
+    minutes = (minutes < 10) ? "0" + minutes : minutes;
+    seconds = (seconds < 10) ? "0" + seconds : seconds;
+
+    timeDisplay.innerHTML = hours + ":" + minutes + ":" + seconds;
+}
+
+function resetStopwatch() {
+    // Stop the timer and reset values
+    clearInterval(tInterval);
+    isRunning = false;
+    runningTime = 0;
+    timeDisplay.innerHTML = "00:00:00"; // Reset time display
+    startStopButton.innerHTML = "Start"; // Change button text back to "Start"
+    
+    // Clear lap list and reset lap counter
+    lapList.innerHTML = ""; // Clears the lap times
+    lapCounter = 1; // Resets lap counter to 1
+}
+ 
+function recordLap() {
+    if (isRunning) {
+        // Record current lap time (formatted)
+        const lapTime = timeDisplay.innerHTML;
+        
+        // Create a new list item for the lap
+        const lapItem = document.createElement("li");
+        lapItem.textContent = `Lap ${lapCounter}: ${lapTime}`;
+        
+        // Append to the lap list
+        lapList.appendChild(lapItem);
+        
+        // Increment lap counter for next lap
+        lapCounter++;
+    }
+}
+</script>
+
